@@ -1,54 +1,27 @@
-KC=	kotlinc
-KFLAG=	-cp
-GLIB=	.
+KC = kotlinc
+KFLAG = -cp
+GLIB = .
 
-all:	libGrafoKt.jar
+TARGET_JAR = libGrafoKt.jar
 
-libGrafoKt.jar: $(GLIB)/Color.class\
-		$(GLIB)/Lado.class\
-		$(GLIB)/Arco.class\
-		$(GLIB)/ArcoCosto.class\
-		$(GLIB)/Arista.class\
-		$(GLIB)/AristaCosto.class\
-		$(GLIB)/Grafo.class\
-		$(GLIB)/GrafoDirigido.class\
-		$(GLIB)/GrafoDirigidoCosto.class\
-		$(GLIB)/GrafoNoDirigido.class\
-		$(GLIB)/GrafoNoDirigidoCosto.class
-	jar -cvf $@ $(GLIB)/*.class 
+KT_SOURCES = $(GLIB)/Color.kt \
+             $(GLIB)/Lado.kt \
+             $(GLIB)/Arco.kt \
+             $(GLIB)/ArcoCosto.kt \
+             $(GLIB)/Arista.kt \
+             $(GLIB)/AristaCosto.kt \
+             $(GLIB)/Grafo.kt \
+             $(GLIB)/GrafoDirigido.kt \
+             $(GLIB)/GrafoDirigidoCosto.kt \
+             $(GLIB)/GrafoNoDirigido.kt \
+             $(GLIB)/GrafoNoDirigidoCosto.kt
 
-$(GLIB)/Color.class: $(GLIB)/Color.kt
-	$(KC) $(GLIB)/Color.kt
+all: $(TARGET_JAR)
 
-$(GLIB)/Lado.class: $(GLIB)/Lado.kt
-	$(KC) $(GLIB)/Lado.kt
+$(TARGET_JAR): $(KT_SOURCES)
+	$(KC) -d $(GLIB) $(KT_SOURCES)
+	jar -cvf $@ -C $(GLIB) .
 
-$(GLIB)/Arco.class: $(GLIB)/Arco.kt
-	$(KC) $(KFLAG) $(GLIB): $(GLIB)/Arco.kt
-
-$(GLIB)/ArcoCosto.class: $(GLIB)/ArcoCosto.kt
-	$(KC) $(KFLAG) $(GLIB): $(GLIB)/ArcoCosto.kt
-
-$(GLIB)/Arista.class: $(GLIB)/Arista.kt
-	$(KC) $(KFLAG) $(GLIB): $(GLIB)/Arista.kt
-
-$(GLIB)/AristaCosto.class: $(GLIB)/AristaCosto.kt
-	$(KC) $(KFLAG) $(GLIB): $(GLIB)/AristaCosto.kt
-
-$(GLIB)/Grafo.class: $(GLIB)/Grafo.kt
-	$(KC) $(KFLAG) $(GLIB): $(GLIB)/Grafo.kt
-
-$(GLIB)/GrafoDirigido.class: $(GLIB)/GrafoDirigido.kt
-	$(KC) $(KFLAG) $(GLIB): $(GLIB)/GrafoDirigido.kt
-
-$(GLIB)/GrafoDirigidoCosto.class: $(GLIB)/GrafoDirigidoCosto.kt
-	$(KC) $(KFLAG) $(GLIB): $(GLIB)/GrafoDirigidoCosto.kt
-
-$(GLIB)/GrafoNoDirigido.class: $(GLIB)/GrafoNoDirigido.kt
-	$(KC) $(KFLAG) $(GLIB): $(GLIB)/GrafoNoDirigido.kt
-
-$(GLIB)/GrafoNoDirigidoCosto.class: $(GLIB)/GrafoNoDirigidoCosto.kt
-	$(KC) $(KFLAG) $(GLIB): $(GLIB)/GrafoNoDirigidoCosto.kt
-
+.PHONY: clean
 clean:
-	rm -rf libGrafoKt.jar META-INF $(GLIB)/*.class
+	rm -rf $(TARGET_JAR) META-INF $(GLIB)/*.class
