@@ -1,6 +1,9 @@
 import java.io.File
 import java.util.Arrays
 
+import java.util.Stack
+import kotlin.math.abs
+
 //GRAFO_DIRIGIDO_COSTO
 public class GrafoDirigidoCosto : Grafo {
     var numeroDeLados = 0
@@ -50,6 +53,73 @@ public class GrafoDirigidoCosto : Grafo {
 		}
 	    }
 	}
+    }
+
+    fun dfs_rw(): List<Int> {
+        val explored = mutableSetOf<Int>()
+        val result = linkedSetOf<Int>()
+        val vertices = (1..numDeVertices).toList() // Vertices are 1-based in the input file
+    
+        fun explore(vertex: Int) {
+            explored += vertex
+            for (arc in adyacentes(vertex)) {
+                val successor = arc.sumidero()
+                if (successor !in explored) {
+                    explore(successor)
+                } else if (successor !in result) {
+                    error("Graph contains a cycle, topological sort not possible!")
+                }
+            }
+            result += vertex
+        }
+    
+        for (vertex in vertices) {
+            if (vertex !in explored) {
+                explore(vertex)
+            }
+        }
+    
+        return result.reversed()
+    }
+    
+    fun kahn(): List<Int> {
+        // Initialize in-degree map
+        val inDegree = mutableMapOf<Int, Int>().apply {
+            for (v in 1..numDeVertices) {
+                put(v, 0)
+            }
+            for (arc in this@GrafoDirigidoCosto) {
+                put(arc.sumidero(), getOrDefault(arc.sumidero(), 0) + 1)
+            }
+        }
+    
+        // Initialize queue with vertices of 0 in-degree
+        val queue = ArrayDeque<Int>().apply {
+            addAll(inDegree.filter { it.value == 0 }.keys)
+        }
+    
+        val result = mutableListOf<Int>()
+        var visitedCount = 0
+    
+        while (queue.isNotEmpty()) {
+            val u = queue.removeFirst()
+            result.add(u)
+            visitedCount++
+    
+            for (arc in adyacentes(u)) {
+                val v = arc.sumidero()
+                inDegree[v] = inDegree[v]!! - 1
+                if (inDegree[v] == 0) {
+                    queue.add(v)
+                }
+            }
+        }
+    
+        if (visitedCount != numDeVertices) {
+            throw IllegalStateException("Graph contains at least one cycle!")
+        }
+    
+        return result
     }
 
     // Agrega un lado al digrafo
