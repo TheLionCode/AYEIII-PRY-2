@@ -1,5 +1,5 @@
 import java.io.File
-import java.util.Arrays
+import java.util.*
 
 import java.util.Stack
 import kotlin.math.abs
@@ -53,6 +53,35 @@ public class GrafoDirigidoCosto : Grafo {
 		}
 	    }
 	}
+    }
+
+    fun dijkstra(start: Int, targets: IntArray): DoubleArray {
+        val n = this.obtenerNumeroDeVertices()
+        val dist = DoubleArray(n + 1) { Double.MAX_VALUE } // +1 because vertices are 1-based
+        dist[start] = 0.0
+        
+        val pq = PriorityQueue<Pair<Int, Double>>(compareBy { it.second })
+        pq.offer(Pair(start, 0.0))
+        
+        while (pq.isNotEmpty()) {
+            val (u, d) = pq.poll()
+            if (d > dist[u]) continue
+            
+            for (arc in this.adyacentes(u)) {
+                val v = arc.sumidero()
+                val w = arc.costo()
+                if (dist[v] > dist[u] + w) {
+                    dist[v] = dist[u] + w
+                    pq.offer(Pair(v, dist[v]))
+                }
+            }
+        }
+        
+        // Extract results for the requested targets
+        return DoubleArray(targets.size) { i ->
+            val target = targets[i]
+            if (target in 1..n) dist[target] else Double.POSITIVE_INFINITY
+        }
     }
 
     fun dfs_rw(): List<Int> {
