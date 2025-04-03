@@ -53,6 +53,52 @@ public class GrafoNoDirigidoCosto: Grafo {
 	}
     }
 
+	fun floydWarshall(): Array<DoubleArray> {
+		val n = numDeVertices
+		// Initialize distance matrix with infinity
+		val dist = Array(n + 1) { DoubleArray(n + 1) { Double.POSITIVE_INFINITY } }
+		
+		// Set distance from each vertex to itself as 0
+		for (i in 1..n) {
+			dist[i][i] = 0.0
+		}
+		
+		// Fill initial distances from edges
+		for (arista in this) {
+			dist[arista.u][arista.v] = arista.costo
+			dist[arista.v][arista.u] = arista.costo  // Undirected graph
+		}
+		
+		// Floyd-Warshall algorithm
+		for (k in 1..n) {
+			for (i in 1..n) {
+				for (j in 1..n) {
+					if (dist[i][k] + dist[k][j] < dist[i][j]) {
+						dist[i][j] = dist[i][k] + dist[k][j]
+					}
+				}
+			}
+		}
+		
+		return dist
+	}
+	
+	// Helper function to print the distance matrix
+	fun printDistanceMatrix() {
+		val dist = floydWarshall()
+		println("Distance matrix:")
+		for (i in 1..numDeVertices) {
+			for (j in 1..numDeVertices) {
+				if (dist[i][j] == Double.POSITIVE_INFINITY) {
+					print("INF\t")
+				} else {
+					print("${dist[i][j]}\t")
+				}
+			}
+			println()
+		}
+	}
+
     // Agrega un lado al grafo no dirigido
     fun agregarAristaCosto(a: AristaCosto) {
 	(adj.get(a.v)).add(a);
